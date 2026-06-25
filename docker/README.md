@@ -14,8 +14,8 @@ docker run -it --rm tensorflow/tensorflow:latest bash
 # inside the container:
 nvidia-smi
 apt update; apt install git
-git clone https://gitlab.com/jiechau/check_sys_info.git
-cd check_sys_info
+git clone https://gitlab.com/jiechau/code_snippet_ai.git
+cd code_snippet_ai
 python tf_mn.py        # every epoch should be < 5 sec
 ```
 
@@ -26,9 +26,9 @@ python tf_mn.py        # every epoch should be < 5 sec
 docker run -it --rm --gpus all nvcr.io/nvidia/pytorch:23.10-py3 bash
 
 # inside the container:
-git clone https://gitlab.com/jiechau/check_sys_info.git
+git clone https://gitlab.com/jiechau/code_snippet_ai.git
 nvidia-smi
-cd check_sys_info
+cd code_snippet_ai
 python pt_mn.py        # every epoch should be < 10 sec
 python pt_mn_cpu.py
 ```

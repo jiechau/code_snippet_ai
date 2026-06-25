@@ -1,4 +1,4 @@
-# check_sys_info — AI / ML Code Snippets
+# code_snippet_ai — AI / ML Code Snippets
 
 A collection of small, self-contained AI / ML code snippets and templates — handy for
 checking that a machine's Python / TensorFlow / PyTorch / CUDA setup works, and as
@@ -10,7 +10,7 @@ and how to run it. Folders are self-contained: they ship the `requirements.*.pip
 file(s) they need.
 
 ```bash
-git clone https://gitlab.com/jiechau/check_sys_info.git
+git clone https://gitlab.com/jiechau/code_snippet_ai.git
 ```
 
 See [venv-setup/](venv-setup/) for the general virtual-environment pattern shared by
