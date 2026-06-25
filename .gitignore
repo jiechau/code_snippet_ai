@@ -12,6 +12,8 @@ build/
 .venv/
 venv/
 env/
+__pydummy__
+__pypackages__/
 
 # Node.js
 node_modules/
@@ -35,3 +37,18 @@ Thumbs.db
 # Environment
 .env
 .env.local
+*.ini
+
+# Data / models
+logs/
+model/
+*.h5
+*.pkl
+*.npy
+*.bak
+*ipynb_checkpoints*
+*Untitled*
+*untitled*
+*test*
+docker-compose.yml
+*~
