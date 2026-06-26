@@ -18,6 +18,9 @@ most snippets.
 
 ## Contents
 
+### Automation & tooling
+- [claude-code-routines/](claude-code-routines/) — tutorial for the Claude Code app's **Routines** (cloud-VM scheduled/triggered agents), with a GitLab issue-work example.
+
 ### Embeddings & similarity
 - [BGE-M3/](BGE-M3/) — BAAI BGE-M3 dense + sparse + ColBERT embedding demo (run with inline `uv`).
 - [sentence-transformer/](sentence-transformer/) — sentence embeddings & similarity with `sentence-transformers`.

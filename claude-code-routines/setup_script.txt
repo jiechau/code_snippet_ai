@@ -1,0 +1,88 @@
+#!/bin/bash
+# =============================================================================
+# Claude Cloud Environment Setup Script
+# Name: glab-repo-issue-work
+# Purpose: Install glab CLI and configure git + GitLab auth via token
+# =============================================================================
+set -euo pipefail
+
+echo "🚀 Starting environment setup..."
+
+# -----------------------------------------------------------------------------
+# 1. Install glab (GitLab CLI)
+# -----------------------------------------------------------------------------
+echo "📦 Installing glab..."
+
+GLAB_VERSION="1.49.0"
+GLAB_TARBALL="glab_${GLAB_VERSION}_linux_amd64.tar.gz"
+GLAB_URL="https://gitlab.com/gitlab-org/cli/-/releases/v${GLAB_VERSION}/downloads/${GLAB_TARBALL}"
+
+curl -fsSL "$GLAB_URL" -o /tmp/glab.tar.gz
+tar -xzf /tmp/glab.tar.gz -C /tmp
+install -m 755 /tmp/bin/glab /usr/local/bin/glab
+rm -f /tmp/glab.tar.gz /tmp/bin/glab
+
+echo "✅ glab installed: $(glab --version)"
+
+# -----------------------------------------------------------------------------
+# 2. Authenticate glab using GITLAB_TOKEN from environment
+#    Token is passed via the Environment Variables field (not this script).
+# -----------------------------------------------------------------------------
+echo "🔑 Authenticating glab..."
+
+if [ -z "${GITLAB_TOKEN:-}" ]; then
+  echo "⚠️  WARNING: GITLAB_TOKEN is not set. glab will not be authenticated."
+  echo "   Add GITLAB_TOKEN=<your_token> to the Environment Variables field."
+else
+  echo "$GITLAB_TOKEN" | glab auth login --stdin --hostname gitlab.com
+  echo "✅ glab authenticated successfully."
+fi
+
+# -----------------------------------------------------------------------------
+# 3. Configure git identity (uses env vars if set, falls back to defaults)
+# -----------------------------------------------------------------------------
+echo "🔧 Configuring git..."
+
+GIT_NAME="${GIT_AUTHOR_NAME:-Claude Bot}"
+GIT_EMAIL="${GIT_AUTHOR_EMAIL:-claude@bot.local}"
+
+git config --global user.name  "$GIT_NAME"
+git config --global user.email "$GIT_EMAIL"
+git config --global init.defaultBranch main
+
+# Use token-based HTTPS auth for git push/pull
+# This lets git operations work without SSH keys
+git config --global credential.helper store
+
+if [ -n "${GITLAB_TOKEN:-}" ] && [ -n "${GITLAB_HOST:-}" ]; then
+  # Write credentials for git HTTPS operations
+  # Format: https://<user>:<token>@<host>
+  GITLAB_HOST="${GITLAB_HOST:-gitlab.com}"
+  echo "https://oauth2:${GITLAB_TOKEN}@${GITLAB_HOST}" > ~/.git-credentials
+  chmod 600 ~/.git-credentials
+  echo "✅ git credentials configured for ${GITLAB_HOST}."
+fi
+
+# -----------------------------------------------------------------------------
+# 4. Install uv (Python package manager used for running pytest)
+# -----------------------------------------------------------------------------
+echo "📦 Installing uv..."
+if ! command -v uv &>/dev/null; then
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.cargo/bin:$PATH"
+  echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+  echo "✅ uv installed: $(uv --version)"
+else
+  echo "✅ uv already present: $(uv --version)"
+fi
+
+# -----------------------------------------------------------------------------
+# 5. Done
+# -----------------------------------------------------------------------------
+echo ""
+echo "============================================"
+echo "✅ Environment setup complete!"
+echo "   glab:  $(glab --version)"
+echo "   git:   $(git --version)"
+echo "   uv:    $(uv --version 2>/dev/null || echo 'check PATH')"
+echo "============================================"
