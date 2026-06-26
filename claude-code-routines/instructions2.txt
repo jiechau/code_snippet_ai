@@ -41,10 +41,10 @@ Use a short slug from the issue title (lowercase, hyphens).
 Work only on the feature branch, inside <PROJECT>'s clone. Commit your changes.
 Do NOT merge to main yet.
 
-### 6. Run tests
-Run: uv run pytest -v
-- If ALL tests PASS → proceed to merge.
-- If ANY test FAILS → read the error, fix the code, commit the fix, run tests again. Keep iterating until all pass.
+### 6. If the work can't be done
+Send a email to jiechau@gmail.com with title 'error on routine <IID>', the message body is the error reason. 
+Delete the branch you just created. 
+Then Go back to step 1 and process the next issue (which may be in a different project).
 
 ### 7. Merge to main
 Run:
