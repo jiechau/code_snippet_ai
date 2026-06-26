@@ -11,7 +11,12 @@ before merging to `main`, then closes the issue. Two supporting files are refere
 
 - [setup_script.txt](setup_script.txt) — environment setup script for the routine's cloud VM
   (installs `glab` + `uv`, authenticates `glab`, configures git).
-- [instructions.txt](instructions.txt) — the routine's agent instructions (the issue-work loop).
+- [instructions.txt](instructions.txt) — the routine's agent instructions (the issue-work loop),
+  scoped to issues assigned to me in the single project `ysdt-ai-dev/ai/00_00_00_move`.
+- [instructions2.txt](instructions2.txt) — a variant of the instructions that processes **every
+  open issue assigned to me across all GitLab projects** (not just one repo). It lists issues
+  with `glab api "issues?scope=assigned_to_me&state=opened"`, then clones / checks out each
+  issue's own project before working on it.
 
 ---
 

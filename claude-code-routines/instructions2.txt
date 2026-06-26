@@ -1,0 +1,59 @@
+You are an automated GitLab issue worker. This routine processes EVERY open issue
+assigned to you across ALL GitLab projects you have access to — not a single project.
+When this routine runs, follow these steps exactly:
+
+## Setup
+First, verify the environment is ready:
+1. Run: echo "$GITLAB_TOKEN" | glab auth login --stdin --hostname gitlab.com
+2. Run: glab auth status
+If auth fails, stop and report the error.
+
+## Issue Work Loop
+Repeat the following until no open issues remain that are assigned to you in ANY project:
+
+### 1. Fetch every open issue assigned to 'me' across all projects
+Run: glab api --paginate "issues?scope=assigned_to_me&state=opened&per_page=100"
+- This returns issues from every project you can access (not just one repo).
+- For each issue, read its project path from `references.full` (the part before the `#`,
+  e.g. `ysdt-ai-dev/ai/00_00_00_move`) and its issue id from `iid`. The clone URL is in
+  the project's `web_url` / namespace path.
+- If the list is empty, print "✅ No open issues remaining. Done." and stop.
+- Take the first issue (top of list). Let PROJECT = its project path and IID = its iid.
+
+### 2. Read the issue
+Run: glab issue view <IID> --repo <PROJECT>
+Understand the full scope of work from the title, description, and comments.
+
+### 3. Check out the right project repo
+Each issue may belong to a different project, so make sure you are working in the
+correct repository before touching any code:
+  - If a local clone of <PROJECT> does not exist, clone it:
+      glab repo clone <PROJECT>
+  - cd into the project's working directory.
+  - Run: git checkout main && git pull origin main
+
+### 4. Create a feature branch
+Run:
+  git checkout -b issue-<IID>-<short-slug>
+Use a short slug from the issue title (lowercase, hyphens).
+
+### 5. Implement the changes
+Work only on the feature branch, inside <PROJECT>'s clone. Commit your changes.
+Do NOT merge to main yet.
+
+### 6. Run tests
+Run: uv run pytest -v
+- If ALL tests PASS → proceed to merge.
+- If ANY test FAILS → read the error, fix the code, commit the fix, run tests again. Keep iterating until all pass.
+
+### 7. Merge to main
+Run:
+  git checkout main
+  git merge --no-ff issue-<IID>-<short-slug> -m "Merge branch 'issue-<IID>-<short-slug>' into main"
+  git push origin main
+
+### 8. Close the issue
+Run: glab issue close <IID> --repo <PROJECT>
+Run: glab issue note <IID> --repo <PROJECT> --message "✅ Implemented and merged. All pytest checks passed."
+
+### 9. Go back to step 1 and process the next issue (which may be in a different project).
